@@ -1,0 +1,36 @@
+{
+  "generator-jhipster": {
+    "promptValues": {
+      "packageName": "com.hunre.phinp"
+    },
+    "jhipsterVersion": "6.4.0",
+    "applicationType": "monolith",
+    "baseName": "shopee",
+    "packageName": "com.hunre.phinp",
+    "packageFolder": "com/hunre/phinp",
+    "serverPort": "8080",
+    "authenticationType": "jwt",
+    "cacheProvider": "no",
+    "websocket": false,
+    "databaseType": "sql",
+    "devDatabaseType": "mysql",
+    "prodDatabaseType": "mysql",
+    "searchEngine": false,
+    "messageBroker": false,
+    "serviceDiscoveryType": false,
+    "buildTool": "maven",
+    "enableSwaggerCodegen": false,
+    "jwtSecretKey": "M2JjMmI4ODBmNWNiNmViYjhiMzQxYjhiMzFkODM0NjExMjMwZWY1YWRiY2Y0MzVjOTQwNTM1ZGIwYjViODE2YjZhNWE4YThlODYyZGE3N2RkOTNmMzM4YzQwZmJjNWIxMjQzNjMyN2I2YmJhYzBjYjY1NDVhYTg5MmM2NjFiM2M=",
+    "embeddableLaunchScript": false,
+    "useSass": true,
+    "clientPackageManager": "npm",
+    "skipClient": true,
+    "testFrameworks": [],
+    "jhiPrefix": "jhi",
+    "entitySuffix": "",
+    "dtoSuffix": "DTO",
+    "otherModules": [],
+    "enableTranslation": false,
+    "blueprints": []
+  }
+}

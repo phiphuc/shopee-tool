@@ -63,6 +63,18 @@ spring:
     # Otherwise, it will be filled in by maven when building the JAR file
     # Either way, it can be overridden by `--spring.profiles.active` value passed in the commandline or `-Dspring.profiles.active` set in `JAVA_OPTS`
     active: #spring.profiles.active#
+#  kafka:
+#    bootstrap-servers: localhost:9092
+#    consumer:
+#      auto-offset-reset: latest
+#      group-id: shopee
+#      properties: { spring: { json: { trusted: { packages: me.hanv } } } }
+#      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+#      enable-auto-commit : false
+#      ackMode: MANUAL_IMMEDIATE
+#    #      auto.commit.interval.ms : 1000
+#    producer:
+#      value-serializer: org.apache.kafka.common.serialization.StringSerializer
   jmx:
     enabled: false
   data:
@@ -153,3 +165,35 @@ jhipster:
 # ===================================================================
 
 # application:
+cloud:
+    topic:
+        login:
+            request: login-request
+            response: login-response
+        otp:
+            request: otp-request
+            response: otp-response
+        follow:
+            request: follow-request
+            response: follow-response
+        username:
+            request: get-username-request
+            response: get-username-response
+        information-shop:
+            request: information-shop-request
+            response: information-shop-response
+        items-shop:
+            request: items-shop-request
+            response: items-shop-response
+        like-item:
+            request: like-item-request
+            response: like-item-response
+        unfollow:
+            request: unfollow-request
+            response: unfollow-response
+        unlike:
+            request: unlike-request
+            response: unlike-response
+        view:
+            request: view-request
+            response: view-response

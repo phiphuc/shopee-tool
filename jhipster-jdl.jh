@@ -1,0 +1,30 @@
+
+entity ShopMain {
+	shopId String,
+	userId String,
+    linkShop String,
+    name String,
+    product String,
+    follow String,
+    following String,
+    rate String,
+    address String,
+    version String,
+    errorMsg String,
+    error String,
+    createDate ZonedDateTime,
+    updateDate ZonedDateTime
+}
+
+entity ShopSub {
+	username String,
+    password String,
+    token String,
+    name String,
+    createDate ZonedDateTime,
+    updateDate ZonedDateTime
+}
+
+relationship ManyToOne {
+  ShopSub{shopId} to ShopMain
+}

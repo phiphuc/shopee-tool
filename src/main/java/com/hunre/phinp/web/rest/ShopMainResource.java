@@ -50,9 +50,6 @@ public class ShopMainResource {
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
-    @Autowired
-    ReplyingKafkaTemplate<String, String,String> kafkaTemplate;
-
     private final ShopMainRepository shopMainRepository;
     private final ShopMainService shopMainService;
 
@@ -75,41 +72,16 @@ public class ShopMainResource {
             throw new BadRequestAlertException("A new shopMain cannot already have an ID", ENTITY_NAME, "idexists");
         }
 
-//        DeferredResult<ResponseEntity<ShopMain>> result = new DeferredResult<>();
-//        CompletableFuture<ShopMain> reply = shopMainService.createShopAsyns(shopMain);
-//        reply.thenAccept(car ->
-//            result.setResult(new ResponseEntity<>(car, HttpStatus.OK))
-//        ).exceptionally(ex -> {
-//            result.setErrorResult(new ApiException());
-//            return null;
-//        });
-
-        shopMain.setCreateDate(ZonedDateTime.of(LocalDateTime.now(), ZoneId.of("Asia/Ho_Chi_Minh")));
-        ShopMain shop = shopMainRepository.save(shopMain);
-        GetInformationRequest request = new GetInformationRequest();
-        request.setId(shop.getId());
-        request.setUsername(shop.getLinkShop());
-        // create producer record
-        ProducerRecord<String, String> record = new ProducerRecord<>("get-username-request", request.toString());
-        // set reply topic in header
-        record.headers().add(new RecordHeader(KafkaHeaders.REPLY_TOPIC, "get-username-request".getBytes()));
-        // post in kafka topic
-        RequestReplyFuture<String, String, String> sendAndReceive = kafkaTemplate.sendAndReceive(record);
-
-        // confirm if producer produced successfully
-        SendResult<String, String> sendResult = sendAndReceive.getSendFuture().get();
-
-        //print all headers
-        sendResult.getProducerRecord().headers().forEach(header -> System.out.println(header.key() + ":" + header.value().toString()));
-
-        // get consumer record
-        ConsumerRecord<String, String> consumerRecord = sendAndReceive.get();
-        log.info(consumerRecord.value());
+        DeferredResult<ResponseEntity<ShopMain>> result = new DeferredResult<>();
+        CompletableFuture<ShopMain> reply = shopMainService.createShopAsyns(shopMain);
+        reply.thenAccept(car ->
+            result.setResult(new ResponseEntity<>(car, HttpStatus.OK))
+        ).exceptionally(ex -> {
+            result.setErrorResult(new ApiException());
+            return null;
+        });
 
 
-
-
-//        ShopMain result = shopMainService.createShop(shopMain);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

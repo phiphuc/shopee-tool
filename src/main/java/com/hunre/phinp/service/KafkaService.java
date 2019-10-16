@@ -31,8 +31,6 @@ public class KafkaService {
     private ShopMainRepository shopMainRepository;
 
 
-    @KafkaListener(topics = "${cloud.topic.username.response}", groupId = "shopee")
-    @Async
     public void updateInformationShop(String msg,
                                        @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
                                        @Header(KafkaHeaders.OFFSET) int offsets,

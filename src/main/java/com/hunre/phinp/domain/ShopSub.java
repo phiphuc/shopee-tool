@@ -1,5 +1,6 @@
 package com.hunre.phinp.domain;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
 
@@ -26,10 +27,17 @@ public class ShopSub implements Serializable {
     private String password;
 
     @Column(name = "token")
+    @Length(max = 21844)
     private String token;
 
     @Column(name = "name")
     private String name;
+
+    @Column(name = "message")
+    private String message;
+
+    @Column(name = "status")
+    private String status;
 
     @Column(name = "create_date")
     private ZonedDateTime createDate;
@@ -102,6 +110,32 @@ public class ShopSub implements Serializable {
         this.name = name;
     }
 
+    public String getMessage() {
+        return message;
+    }
+
+    public ShopSub message(String message) {
+        this.message = message;
+        return this;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public ShopSub status(String status) {
+        this.status = status;
+        return this;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
     public ZonedDateTime getCreateDate() {
         return createDate;
     }
@@ -166,6 +200,8 @@ public class ShopSub implements Serializable {
             ", password='" + getPassword() + "'" +
             ", token='" + getToken() + "'" +
             ", name='" + getName() + "'" +
+            ", message='" + getMessage() + "'" +
+            ", status='" + getStatus() + "'" +
             ", createDate='" + getCreateDate() + "'" +
             ", updateDate='" + getUpdateDate() + "'" +
             "}";

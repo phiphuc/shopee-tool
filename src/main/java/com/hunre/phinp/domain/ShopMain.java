@@ -54,6 +54,9 @@ public class ShopMain implements Serializable {
     @Column(name = "error")
     private String error;
 
+    @Column(name = "status")
+    private String status;
+
     @Column(name = "create_date")
     private ZonedDateTime createDate;
 
@@ -225,6 +228,19 @@ public class ShopMain implements Serializable {
         this.error = error;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public ShopMain status(String status) {
+        this.status = status;
+        return this;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
     public ZonedDateTime getCreateDate() {
         return createDate;
     }
@@ -284,6 +300,7 @@ public class ShopMain implements Serializable {
             ", version='" + getVersion() + "'" +
             ", errorMsg='" + getErrorMsg() + "'" +
             ", error='" + getError() + "'" +
+            ", status='" + getStatus() + "'" +
             ", createDate='" + getCreateDate() + "'" +
             ", updateDate='" + getUpdateDate() + "'" +
             "}";

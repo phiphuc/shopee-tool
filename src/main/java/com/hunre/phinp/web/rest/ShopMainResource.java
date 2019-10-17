@@ -76,30 +76,30 @@ public class ShopMainResource {
         reply.thenAccept(msg -> {
                 String msgTemp = String.valueOf(msg);
                 Gson requestGson = new Gson();
-            GetIdByUsernameKafkaResponse request = requestGson.fromJson(msgTemp, GetIdByUsernameKafkaResponse.class);
-            ShopMain shopDate = new ShopMain();
-            Optional<ShopMain> optionShop =  shopMainRepository.findById(request.getId());
-            if(optionShop.isPresent()){
-                optionShop.ifPresent(shop -> {
-                    shopDate.setShopId(shop.getShopId());
-                    shopDate.setLinkShop(shop.getLinkShop());
-                    shopDate.setUpdateDate(ZonedDateTime.of(LocalDateTime.now(), ZoneId.of("Asia/Ho_Chi_Minh")));
-                    shopDate.setCreateDate(shop.getCreateDate());
-                    shopDate.setShopId(request.getShopId());
-                    shopDate.setVersion(request.getVersion());
-                    shopDate.setUserId("");
-                    shopDate.setRate(request.getRate());
-                    shopDate.setProduct(request.getProduct());
-                    shopDate.setName(request.getName());
-                    shopDate.setAddress(request.getAddress());
-                    shopDate.setErrorMsg(request.getError_msg());
-                    shopDate.setError(request.getError());
-                    shopDate.setId(shop.getId());
-                    shopDate.setFollowing(request.getFollowing());
-                    shopDate.setFollow(request.getFollow());
-                    shopMainRepository.save(shopDate);
-                });
-            }
+                GetIdByUsernameKafkaResponse request = requestGson.fromJson(msgTemp, GetIdByUsernameKafkaResponse.class);
+                ShopMain shopDate = new ShopMain();
+                Optional<ShopMain> optionShop =  shopMainRepository.findById(request.getId());
+                if(optionShop.isPresent()){
+                    optionShop.ifPresent(shop -> {
+                        shopDate.setShopId(shop.getShopId());
+                        shopDate.setLinkShop(shop.getLinkShop());
+                        shopDate.setUpdateDate(ZonedDateTime.of(LocalDateTime.now(), ZoneId.of("Asia/Ho_Chi_Minh")));
+                        shopDate.setCreateDate(shop.getCreateDate());
+                        shopDate.setShopId(request.getShopId());
+                        shopDate.setVersion(request.getVersion());
+                        shopDate.setUserId("");
+                        shopDate.setRate(request.getRate());
+                        shopDate.setProduct(request.getProduct());
+                        shopDate.setName(request.getName());
+                        shopDate.setAddress(request.getAddress());
+                        shopDate.setErrorMsg(request.getError_msg());
+                        shopDate.setError(request.getError());
+                        shopDate.setId(shop.getId());
+                        shopDate.setFollowing(request.getFollowing());
+                        shopDate.setFollow(request.getFollow());
+                        shopMainRepository.save(shopDate);
+                    });
+                }
                 result.setResult(new ResponseEntity<>(shopDate, HttpStatus.OK));
             }
         ).exceptionally(ex -> {

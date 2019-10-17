@@ -1,7 +1,10 @@
 package com.hunre.phinp.repository;
 import com.hunre.phinp.domain.ShopMain;
+import com.hunre.phinp.domain.ShopSub;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 
 /**
@@ -10,5 +13,7 @@ import org.springframework.stereotype.Repository;
 @SuppressWarnings("unused")
 @Repository
 public interface ShopMainRepository extends JpaRepository<ShopMain, Long> {
+
+
 
 }

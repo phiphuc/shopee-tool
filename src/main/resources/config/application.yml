@@ -65,7 +65,7 @@ spring:
     active: #spring.profiles.active#
   autoconfigure:
     exclude: org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration
-  kafka:
+  spring:
     bootstrap-servers: localhost:9092
     consumer:
       auto-offset-reset: earliest
@@ -104,6 +104,8 @@ spring:
   mvc:
     favicon:
       enabled: false
+    async:
+      request-timeout: -1
   task:
     execution:
       thread-name-prefix: shopee-task-
@@ -173,6 +175,8 @@ jhipster:
 
 # application:
 cloud:
+    timeout: 6000000
+    group: shopee
     topic:
         login:
             request: login-request
@@ -192,7 +196,7 @@ cloud:
         items-shop:
             request: items-shop-request
             response: items-shop-response
-        like-item:
+        like:
             request: like-item-request
             response: like-item-response
         unfollow:

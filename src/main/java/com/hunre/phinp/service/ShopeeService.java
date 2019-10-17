@@ -15,8 +15,6 @@ import org.springframework.stereotype.Service;
 public class ShopeeService {
     private final Logger log = LoggerFactory.getLogger(ShopeeService.class);
 
-    @Autowired
-    private KafkaTemplate<String, String> kafkaTemplate;
 
     private ShopMainRepository shopMainRepository;
     private ShopSubRepository shopSubRepository;

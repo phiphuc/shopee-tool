@@ -5,6 +5,7 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
@@ -20,11 +21,46 @@ import java.util.Map;
 @Configuration
 @EnableKafka
 public class KafkaConfiguration {
-    private String bootstrapServers = "localhost:9092";
 
-    private String requestReplyTopic = "default-topic";
+    @Value("${spring.spring.bootstrap-servers}")
+    private String bootstrapServers;
 
-    private String consumerGroup = "shopee";
+    @Value("${cloud.group}")
+    private String group;
+
+    @Value("${cloud.timeout}")
+    private String timeout;
+
+    @Value("${cloud.topic.login.request}")
+    private String login;
+
+    @Value("${cloud.topic.otp.request}")
+    private String otp;
+
+    @Value("${cloud.topic.follow.request}")
+    private String follow;
+
+    @Value("${cloud.topic.unfollow.request}")
+    private String unfollow;
+
+    @Value("${cloud.topic.like.request}")
+    private String like;
+
+    @Value("${cloud.topic.unlike.request}")
+    private String unlike;
+
+    @Value("${cloud.topic.username.request}")
+    private String username;
+
+    @Value("${cloud.topic.information-shop.request}")
+    private String information;
+
+    @Value("${cloud.topic.items-shop.request}")
+    private String items;
+
+    @Value("${cloud.topic.view.request}")
+    private String view;
+
 
     @Bean
     public Map<String, Object> consumerConfigs() {
@@ -32,7 +68,7 @@ public class KafkaConfiguration {
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, "shopee");
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, group);
 
         return props;
     }
@@ -53,7 +89,7 @@ public class KafkaConfiguration {
             new CompletableFutureReplyingKafkaTemplate<>(requestProducerFactory(),
                 replyListenerContainer());
         requestReplyKafkaTemplate.setDefaultTopic("default");
-        requestReplyKafkaTemplate.setReplyTimeout(100000);
+        requestReplyKafkaTemplate.setReplyTimeout(Long.parseLong(timeout));
         return requestReplyKafkaTemplate;
     }
 
@@ -84,9 +120,72 @@ public class KafkaConfiguration {
     }
 
     @Bean
-    public NewTopic replyTopic() {
+    public NewTopic replyLogin() {
         Map<String, String> configs = new HashMap<>();
-        configs.put("retention.ms", "100000");
-        return new NewTopic("default", 2, (short) 2).configs(configs);
+        configs.put("retention.ms", timeout);
+        return new NewTopic(login, 2, (short) 2).configs(configs);
+    }
+
+    @Bean
+    public NewTopic replyOtp() {
+        Map<String, String> configs = new HashMap<>();
+        configs.put("retention.ms", timeout);
+        return new NewTopic(otp, 2, (short) 2).configs(configs);
+    }
+
+    @Bean
+    public NewTopic replyLike() {
+        Map<String, String> configs = new HashMap<>();
+        configs.put("retention.ms", timeout);
+        return new NewTopic(like, 2, (short) 2).configs(configs);
+    }
+
+    @Bean
+    public NewTopic replyUnlike() {
+        Map<String, String> configs = new HashMap<>();
+        configs.put("retention.ms", timeout);
+        return new NewTopic(unlike, 2, (short) 2).configs(configs);
+    }
+
+    @Bean
+    public NewTopic replyFollow() {
+        Map<String, String> configs = new HashMap<>();
+        configs.put("retention.ms", timeout);
+        return new NewTopic(follow, 2, (short) 2).configs(configs);
+    }
+
+    @Bean
+    public NewTopic replyUnfollow() {
+        Map<String, String> configs = new HashMap<>();
+        configs.put("retention.ms", timeout);
+        return new NewTopic(unfollow, 2, (short) 2).configs(configs);
+    }
+
+    @Bean
+    public NewTopic replyUsername() {
+        Map<String, String> configs = new HashMap<>();
+        configs.put("retention.ms", timeout);
+        return new NewTopic(username, 2, (short) 2).configs(configs);
+    }
+
+    @Bean
+    public NewTopic replyInformation() {
+        Map<String, String> configs = new HashMap<>();
+        configs.put("retention.ms", timeout);
+        return new NewTopic(information, 2, (short) 2).configs(configs);
+    }
+
+    @Bean
+    public NewTopic replyItem() {
+        Map<String, String> configs = new HashMap<>();
+        configs.put("retention.ms", timeout);
+        return new NewTopic(items, 2, (short) 2).configs(configs);
+    }
+
+    @Bean
+    public NewTopic replyView() {
+        Map<String, String> configs = new HashMap<>();
+        configs.put("retention.ms", timeout);
+        return new NewTopic(view, 2, (short) 2).configs(configs);
     }
 }

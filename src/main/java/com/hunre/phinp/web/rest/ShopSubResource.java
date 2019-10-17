@@ -4,9 +4,11 @@ import com.google.gson.Gson;
 import com.hunre.phinp.domain.ShopSub;
 import com.hunre.phinp.repository.ShopSubRepository;
 import com.hunre.phinp.service.ShopSubService;
+import com.hunre.phinp.service.dto.ShopSubDTO;
 import com.hunre.phinp.web.rest.errors.BadRequestAlertException;
 
 import domain.shopee.response.GetIdByUsernameKafkaResponse;
+import domain.shopee.response.LoginResponse;
 import domain.shopee.response.OtpResponse;
 import io.github.jhipster.web.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;
@@ -47,7 +49,7 @@ public class ShopSubResource {
 
     private final ShopSubService shopSubService;
 
-    public ShopSubResource(ShopSubRepository shopSubRepository,  ShopSubService shopSubService) {
+    public ShopSubResource(ShopSubRepository shopSubRepository, ShopSubService shopSubService) {
         this.shopSubRepository = shopSubRepository;
         this.shopSubService = shopSubService;
     }
@@ -72,10 +74,10 @@ public class ShopSubResource {
     }
 
     @PostMapping("/shop-subs/otp")
-    public DeferredResult<ResponseEntity<ShopSub>> getOtp(@RequestBody ShopSub shopSub) throws URISyntaxException {
+    public DeferredResult<ResponseEntity<ShopSub>> getOtp(@RequestBody ShopSubDTO shopSub) throws URISyntaxException {
         log.debug("REST request to getOtp : {}", shopSub);
 
-        if(shopSub.getShopId() == null){
+        if (shopSub.getShopId() == null) {
 
         }
         DeferredResult<ResponseEntity<ShopSub>> result = new DeferredResult<>();
@@ -83,10 +85,11 @@ public class ShopSubResource {
         reply.thenAccept(msg -> {
                 String msgTemp = String.valueOf(msg);
                 Gson requestGson = new Gson();
-            OtpResponse request = requestGson.fromJson(msgTemp, OtpResponse.class);
-            ShopSub shopResult = new ShopSub();
-                Optional<ShopSub> optionShop =  shopSubRepository.findById(request.getId());
-                if(optionShop.isPresent()){
+                //error code = 1 thanh cong
+                OtpResponse request = requestGson.fromJson(msgTemp, OtpResponse.class);
+                ShopSub shopResult = new ShopSub();
+                Optional<ShopSub> optionShop = shopSubRepository.findById(request.getId());
+                if (optionShop.isPresent()) {
                     optionShop.ifPresent(shop -> {
                         shopResult.setId(shop.getId());
                         shopResult.setName(shop.getName());
@@ -95,6 +98,10 @@ public class ShopSubResource {
                         shopResult.setPassword(shop.getPassword());
                         shopResult.setShopId(shop.getShopId());
                         shopResult.setToken(request.getCookie());
+                        shopResult.setStatus(request.getErrorCode().equals("1") ? "SUCCESS" : "FALL");
+                        shopResult.setMessage(request.getMessage());
+                        shopResult.setUsername(shop.getUsername());
+                        shopSubRepository.save(shopResult);
                     });
                 }
                 result.setResult(new ResponseEntity<>(shopResult, HttpStatus.OK));
@@ -104,11 +111,51 @@ public class ShopSubResource {
             return null;
         });
 
-
         return result;
 
     }
 
+    @PostMapping("/shop-subs/login")
+    public DeferredResult<ResponseEntity<ShopSub>> getLogin(@RequestBody ShopSubDTO shopSub) throws URISyntaxException {
+        log.debug("REST request to getOtp : {}", shopSub);
+
+        if (shopSub.getShopId() == null) {
+
+        }
+        DeferredResult<ResponseEntity<ShopSub>> result = new DeferredResult<>();
+        CompletableFuture<String> reply = shopSubService.getLogin(shopSub);
+        reply.thenAccept(msg -> {
+                String msgTemp = String.valueOf(msg);
+                Gson requestGson = new Gson();
+
+                //error code = 0 thanh cong, 2 là sai otp
+                LoginResponse response = requestGson.fromJson(msgTemp, LoginResponse.class);
+                ShopSub shopResult = new ShopSub();
+                Optional<ShopSub> optionShop = shopSubRepository.findById(response.getId());
+                if (optionShop.isPresent()) {
+                    optionShop.ifPresent(shop -> {
+                        shopResult.setId(shop.getId());
+                        shopResult.setName(response.getUserid());
+                        shopResult.setCreateDate(shop.getCreateDate());
+                        shopResult.setUpdateDate(ZonedDateTime.of(LocalDateTime.now(), ZoneId.of("Asia/Ho_Chi_Minh")));
+                        shopResult.setPassword(shop.getPassword());
+                        shopResult.setShopId(shop.getShopId());
+                        shopResult.setToken(response.getCookie());
+                        shopResult.setStatus(response.getError().equals("0") ? "ACTIVE" : "INACTIVE");
+                        shopResult.setUsername(shop.getUsername());
+                        shopSubRepository.save(shopResult);
+                    });
+                }
+                result.setResult(new ResponseEntity<>(shopResult, HttpStatus.OK));
+            }
+        ).exceptionally(ex -> {
+            result.setErrorResult(new ApiException());
+            return null;
+        });
+
+        return result;
+
+    }
     /**
      * {@code PUT  /shop-subs} : Updates an existing shopSub.
      *
@@ -133,7 +180,6 @@ public class ShopSubResource {
     /**
      * {@code GET  /shop-subs} : get all the shopSubs.
      *
-
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of shopSubs in body.
      */
     @GetMapping("/shop-subs")

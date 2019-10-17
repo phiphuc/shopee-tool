@@ -1,22 +1,33 @@
 package com.hunre.phinp.web.rest;
 
+import com.google.gson.Gson;
 import com.hunre.phinp.domain.ShopSub;
 import com.hunre.phinp.repository.ShopSubRepository;
+import com.hunre.phinp.service.ShopSubService;
 import com.hunre.phinp.web.rest.errors.BadRequestAlertException;
 
+import domain.shopee.response.GetIdByUsernameKafkaResponse;
+import domain.shopee.response.OtpResponse;
 import io.github.jhipster.web.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;
+import org.apache.kafka.common.errors.ApiException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.async.DeferredResult;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * REST controller for managing {@link com.hunre.phinp.domain.ShopSub}.
@@ -34,8 +45,11 @@ public class ShopSubResource {
 
     private final ShopSubRepository shopSubRepository;
 
-    public ShopSubResource(ShopSubRepository shopSubRepository) {
+    private final ShopSubService shopSubService;
+
+    public ShopSubResource(ShopSubRepository shopSubRepository,  ShopSubService shopSubService) {
         this.shopSubRepository = shopSubRepository;
+        this.shopSubService = shopSubService;
     }
 
     /**
@@ -55,6 +69,44 @@ public class ShopSubResource {
         return ResponseEntity.created(new URI("/api/shop-subs/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
             .body(result);
+    }
+
+    @PostMapping("/shop-subs/otp")
+    public DeferredResult<ResponseEntity<ShopSub>> getOtp(@RequestBody ShopSub shopSub) throws URISyntaxException {
+        log.debug("REST request to getOtp : {}", shopSub);
+
+        if(shopSub.getShopId() == null){
+
+        }
+        DeferredResult<ResponseEntity<ShopSub>> result = new DeferredResult<>();
+        CompletableFuture<String> reply = shopSubService.getOtp(shopSub);
+        reply.thenAccept(msg -> {
+                String msgTemp = String.valueOf(msg);
+                Gson requestGson = new Gson();
+            OtpResponse request = requestGson.fromJson(msgTemp, OtpResponse.class);
+            ShopSub shopResult = new ShopSub();
+                Optional<ShopSub> optionShop =  shopSubRepository.findById(request.getId());
+                if(optionShop.isPresent()){
+                    optionShop.ifPresent(shop -> {
+                        shopResult.setId(shop.getId());
+                        shopResult.setName(shop.getName());
+                        shopResult.setCreateDate(shop.getCreateDate());
+                        shopResult.setUpdateDate(ZonedDateTime.of(LocalDateTime.now(), ZoneId.of("Asia/Ho_Chi_Minh")));
+                        shopResult.setPassword(shop.getPassword());
+                        shopResult.setShopId(shop.getShopId());
+                        shopResult.setToken(request.getCookie());
+                    });
+                }
+                result.setResult(new ResponseEntity<>(shopResult, HttpStatus.OK));
+            }
+        ).exceptionally(ex -> {
+            result.setErrorResult(new ApiException());
+            return null;
+        });
+
+
+        return result;
+
     }
 
     /**

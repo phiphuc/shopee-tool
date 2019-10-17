@@ -1,11 +1,13 @@
 package com.hunre.phinp.web.rest;
 
+import com.google.gson.Gson;
 import com.hunre.phinp.domain.ShopMain;
 import com.hunre.phinp.repository.ShopMainRepository;
 import com.hunre.phinp.service.ShopMainService;
 import com.hunre.phinp.web.rest.errors.BadRequestAlertException;
 
 import domain.shopee.request.GetInformationRequest;
+import domain.shopee.response.GetIdByUsernameKafkaResponse;
 import io.github.jhipster.web.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -66,23 +68,47 @@ public class ShopMainResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("/shop-mains")
-    public ResponseEntity<ShopMain> createShopMain(@RequestBody ShopMain shopMain) throws URISyntaxException, ExecutionException, InterruptedException {
+    public DeferredResult<ResponseEntity<ShopMain>> createShopMain(@RequestBody ShopMain shopMain) throws URISyntaxException, ExecutionException, InterruptedException {
         log.debug("REST request to save ShopMain : {}", shopMain);
-        if (shopMain.getId() != null) {
-            throw new BadRequestAlertException("A new shopMain cannot already have an ID", ENTITY_NAME, "idexists");
-        }
 
         DeferredResult<ResponseEntity<ShopMain>> result = new DeferredResult<>();
-        CompletableFuture<ShopMain> reply = shopMainService.createShopAsyns(shopMain);
-        reply.thenAccept(car ->
-            result.setResult(new ResponseEntity<>(car, HttpStatus.OK))
+        CompletableFuture<String> reply = shopMainService.createShopAsyns(shopMain);
+        reply.thenAccept(msg -> {
+                String msgTemp = String.valueOf(msg);
+                Gson requestGson = new Gson();
+            GetIdByUsernameKafkaResponse request = requestGson.fromJson(msgTemp, GetIdByUsernameKafkaResponse.class);
+            ShopMain shopDate = new ShopMain();
+            Optional<ShopMain> optionShop =  shopMainRepository.findById(request.getId());
+            if(optionShop.isPresent()){
+                optionShop.ifPresent(shop -> {
+                    shopDate.setShopId(shop.getShopId());
+                    shopDate.setLinkShop(shop.getLinkShop());
+                    shopDate.setUpdateDate(ZonedDateTime.of(LocalDateTime.now(), ZoneId.of("Asia/Ho_Chi_Minh")));
+                    shopDate.setCreateDate(shop.getCreateDate());
+                    shopDate.setShopId(request.getShopId());
+                    shopDate.setVersion(request.getVersion());
+                    shopDate.setUserId("");
+                    shopDate.setRate(request.getRate());
+                    shopDate.setProduct(request.getProduct());
+                    shopDate.setName(request.getName());
+                    shopDate.setAddress(request.getAddress());
+                    shopDate.setErrorMsg(request.getError_msg());
+                    shopDate.setError(request.getError());
+                    shopDate.setId(shop.getId());
+                    shopDate.setFollowing(request.getFollowing());
+                    shopDate.setFollow(request.getFollow());
+                    shopMainRepository.save(shopDate);
+                });
+            }
+                result.setResult(new ResponseEntity<>(shopDate, HttpStatus.OK));
+            }
         ).exceptionally(ex -> {
             result.setErrorResult(new ApiException());
             return null;
         });
 
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return result;
     }
 
     /**
@@ -109,7 +135,6 @@ public class ShopMainResource {
     /**
      * {@code GET  /shop-mains} : get all the shopMains.
      *
-
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of shopMains in body.
      */
     @GetMapping("/shop-mains")

@@ -1,5 +1,6 @@
 package com.hunre.phinp.service;
 
+import com.google.gson.Gson;
 import com.hunre.phinp.config.kafka.CompletableFutureReplyingKafkaOperations;
 import com.hunre.phinp.domain.ShopMain;
 import com.hunre.phinp.repository.ShopMainRepository;
@@ -44,14 +45,14 @@ public class ShopMainService {
 //        return shop;
 //    }
 //
-    public CompletableFuture<ShopMain> createShopAsyns(ShopMain shopMain) {
+    public CompletableFuture<String> createShopAsyns(ShopMain shopMain) {
         shopMain.setCreateDate(ZonedDateTime.of(LocalDateTime.now(), ZoneId.of("Asia/Ho_Chi_Minh")));
         ShopMain shop = shopMainRepository.save(shopMain);
         GetInformationRequest request = new GetInformationRequest();
         request.setId(shop.getId());
         request.setUsername(shop.getLinkShop());
-        CompletableFuture<String> x=  requestReplyKafkaTemplate.requestReply(usernameRequest, request.toString());
-        return null;
+        return requestReplyKafkaTemplate.requestReply(usernameRequest, request.toString());
+
     }
 
 

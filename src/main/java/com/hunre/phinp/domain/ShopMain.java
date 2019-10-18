@@ -10,7 +10,7 @@ import java.time.ZonedDateTime;
  */
 @Entity
 @Table(name = "shop_main")
-public class ShopMain implements Serializable {
+public class ShopMain extends domain.shopee.request.ShopMain implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -50,9 +50,6 @@ public class ShopMain implements Serializable {
 
     @Column(name = "error_msg")
     private String errorMsg;
-
-    @Column(name = "error")
-    private String error;
 
     @Column(name = "status")
     private String status;
@@ -215,18 +212,6 @@ public class ShopMain implements Serializable {
         this.errorMsg = errorMsg;
     }
 
-    public String getError() {
-        return error;
-    }
-
-    public ShopMain error(String error) {
-        this.error = error;
-        return this;
-    }
-
-    public void setError(String error) {
-        this.error = error;
-    }
 
     public String getStatus() {
         return status;

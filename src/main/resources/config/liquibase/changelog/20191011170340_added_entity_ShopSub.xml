@@ -40,6 +40,9 @@
             <column name="update_date" type="datetime">
                 <constraints nullable="true" />
             </column>
+            <column name="error_code" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
             <column name="shop_id_id" type="bigint">
                 <constraints nullable="true" />
             </column>
@@ -76,6 +79,7 @@
             <column name="status" type="string"/>
             <column name="create_date" type="datetime"/>
             <column name="update_date" type="datetime"/>
+            <column name="error_code" type="string"/>
             <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here, do not remove-->
         </loadData>
     </changeSet>

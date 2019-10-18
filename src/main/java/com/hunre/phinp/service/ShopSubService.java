@@ -50,10 +50,10 @@ public class ShopSubService {
         shopSub.createDate(ZonedDateTime.of(LocalDateTime.now(), ZoneId.of("Asia/Ho_Chi_Minh")));
         shopSub.setShopId(shopMainRepository.findById(shopSubDTO.getShopId()).get());
 
-        Optional<ShopSub> lstShopSub = shopSubRepository.findByUsername(shopSubDTO.getUsername());
-        lstShopSub.ifPresent(shopSub1 -> {
-
-        });
+//        Optional<ShopSub> lstShopSub = shopSubRepository.findByUsername(shopSubDTO.getUsername());
+//        lstShopSub.ifPresent(shopSub1 -> {
+//
+//        });
         ShopSub sub = shopSubRepository.save(shopSub);
         OtpRequest otpRequest =  new OtpRequest();
         otpRequest.setId(sub.getId());

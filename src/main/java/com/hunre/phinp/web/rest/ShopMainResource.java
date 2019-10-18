@@ -8,6 +8,8 @@ import com.hunre.phinp.web.rest.errors.BadRequestAlertException;
 
 import domain.shopee.request.GetInformationRequest;
 import domain.shopee.response.GetIdByUsernameKafkaResponse;
+import domain.shopee.response.GetIdsByUsernameShopeeResponse;
+import domain.shopee.response.ShopMainResponse;
 import io.github.jhipster.web.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -68,15 +70,16 @@ public class ShopMainResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("/shop-mains")
-    public DeferredResult<ResponseEntity<ShopMain>> createShopMain(@RequestBody ShopMain shopMain) throws URISyntaxException, ExecutionException, InterruptedException {
+    public DeferredResult<ResponseEntity<ShopMainResponse>> createShopMain(@RequestBody ShopMain shopMain) throws URISyntaxException, ExecutionException, InterruptedException {
         log.debug("REST request to save ShopMain : {}", shopMain);
 
-        DeferredResult<ResponseEntity<ShopMain>> result = new DeferredResult<>();
+        DeferredResult<ResponseEntity<ShopMainResponse>> result = new DeferredResult<>();
+        ShopMainResponse res = new ShopMainResponse();
         CompletableFuture<String> reply = shopMainService.createShopAsyns(shopMain);
         reply.thenAccept(msg -> {
                 String msgTemp = String.valueOf(msg);
                 Gson requestGson = new Gson();
-                GetIdByUsernameKafkaResponse request = requestGson.fromJson(msgTemp, GetIdByUsernameKafkaResponse.class);
+            GetIdByUsernameKafkaResponse request = requestGson.fromJson(msgTemp, GetIdByUsernameKafkaResponse.class);
                 ShopMain shopDate = new ShopMain();
                 Optional<ShopMain> optionShop =  shopMainRepository.findById(request.getId());
                 if(optionShop.isPresent()){
@@ -98,9 +101,11 @@ public class ShopMainResource {
                         shopDate.setFollowing(request.getFollowing());
                         shopDate.setFollow(request.getFollow());
                         shopMainRepository.save(shopDate);
+                        res.setData(shopDate);
+                        res.setErrorCode(0);
                     });
                 }
-                result.setResult(new ResponseEntity<>(shopDate, HttpStatus.OK));
+                result.setResult(new ResponseEntity<>(res, HttpStatus.OK));
             }
         ).exceptionally(ex -> {
             result.setErrorResult(new ApiException());

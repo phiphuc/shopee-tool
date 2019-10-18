@@ -10,6 +10,7 @@ import com.hunre.phinp.web.rest.errors.BadRequestAlertException;
 import domain.shopee.response.GetIdByUsernameKafkaResponse;
 import domain.shopee.response.LoginResponse;
 import domain.shopee.response.OtpResponse;
+import domain.shopee.response.ShopSubResponse;
 import io.github.jhipster.web.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.apache.kafka.common.errors.ApiException;
@@ -74,13 +75,25 @@ public class ShopSubResource {
     }
 
     @PostMapping("/shop-subs/otp")
-    public DeferredResult<ResponseEntity<ShopSub>> getOtp(@RequestBody ShopSubDTO shopSub) throws URISyntaxException {
+    public DeferredResult<ResponseEntity<ShopSubResponse>> getOtp(@RequestBody ShopSubDTO shopSub) {
         log.debug("REST request to getOtp : {}", shopSub);
 
+        DeferredResult<ResponseEntity<ShopSubResponse>> result = new DeferredResult<>();
+        ShopSubResponse res  = new ShopSubResponse();
         if (shopSub.getShopId() == null) {
-
+            res.setErrorCode(11);
+            res.setMessage("Không có shop id");
+            result.setResult(new ResponseEntity<>(res, HttpStatus.OK));
+            return result;
         }
-        DeferredResult<ResponseEntity<ShopSub>> result = new DeferredResult<>();
+
+        Optional<List<ShopSub>> optionalShopSubs = shopSubRepository.findByUsernameAndStatus(shopSub.getUsername(), "ACTIVE");
+        if(optionalShopSubs.isPresent()){
+            res.setErrorCode(12);
+            res.setMessage("Tài khoản đăng kí trùng");
+            result.setResult(new ResponseEntity<>(res, HttpStatus.OK));
+            return result;
+        }
         CompletableFuture<String> reply = shopSubService.getOtp(shopSub);
         reply.thenAccept(msg -> {
                 String msgTemp = String.valueOf(msg);
@@ -98,13 +111,15 @@ public class ShopSubResource {
                         shopResult.setPassword(shop.getPassword());
                         shopResult.setShopId(shop.getShopId());
                         shopResult.setToken(request.getCookie());
-                        shopResult.setStatus(request.getErrorCode().equals("1") ? "SUCCESS" : "FALL");
+                        shopResult.setStatus(request.getErrorCode().equals(0) ? "SUCCESS" : "FALL");
                         shopResult.setMessage(request.getMessage());
                         shopResult.setUsername(shop.getUsername());
                         shopSubRepository.save(shopResult);
+                        res.setData(shopResult);
+                        res.setErrorCode(Integer.parseInt(request.getErrorCode()));
                     });
                 }
-                result.setResult(new ResponseEntity<>(shopResult, HttpStatus.OK));
+                result.setResult(new ResponseEntity<>(res, HttpStatus.OK));
             }
         ).exceptionally(ex -> {
             result.setErrorResult(new ApiException());
@@ -116,14 +131,17 @@ public class ShopSubResource {
     }
 
     @PostMapping("/shop-subs/login")
-    public DeferredResult<ResponseEntity<ShopSub>> getLogin(@RequestBody ShopSubDTO shopSub) throws URISyntaxException {
+    public DeferredResult<ResponseEntity<ShopSubResponse>> getLogin(@RequestBody ShopSubDTO shopSub) throws URISyntaxException {
         log.debug("REST request to getOtp : {}", shopSub);
-
+        DeferredResult<ResponseEntity<ShopSubResponse>> result = new DeferredResult<>();
         if (shopSub.getShopId() == null) {
 
         }
-        DeferredResult<ResponseEntity<ShopSub>> result = new DeferredResult<>();
+
+       // Optional<List<ShopSub>> optionalShopSubs = shopSubRepository.findByUsernameAndStatus(shopSub.getUsername(),"ACTIVE");
+
         CompletableFuture<String> reply = shopSubService.getLogin(shopSub);
+        ShopSubResponse res = new ShopSubResponse();
         reply.thenAccept(msg -> {
                 String msgTemp = String.valueOf(msg);
                 Gson requestGson = new Gson();
@@ -141,12 +159,15 @@ public class ShopSubResource {
                         shopResult.setPassword(shop.getPassword());
                         shopResult.setShopId(shop.getShopId());
                         shopResult.setToken(response.getCookie());
-                        shopResult.setStatus(response.getError().equals("0") ? "ACTIVE" : "INACTIVE");
+                        shopResult.setStatus(response.getError().equals(0) ? "ACTIVE" : "INACTIVE");
                         shopResult.setUsername(shop.getUsername());
                         shopSubRepository.save(shopResult);
+                        res.setData(shopResult);
+                        res.setErrorCode(response.getError());
                     });
                 }
-                result.setResult(new ResponseEntity<>(shopResult, HttpStatus.OK));
+
+                result.setResult(new ResponseEntity<>(res, HttpStatus.OK));
             }
         ).exceptionally(ex -> {
             result.setErrorResult(new ApiException());

@@ -50,12 +50,20 @@
             "fieldType": "String"
         },
         {
+            "fieldName": "status",
+            "fieldType": "String"
+        },
+        {
             "fieldName": "createDate",
             "fieldType": "ZonedDateTime"
         },
         {
             "fieldName": "updateDate",
             "fieldType": "ZonedDateTime"
+        },
+        {
+            "fieldName": "errorCode",
+            "fieldType": "String"
         }
     ],
     "relationships": [],

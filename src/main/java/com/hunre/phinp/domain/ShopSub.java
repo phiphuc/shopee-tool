@@ -1,6 +1,5 @@
 package com.hunre.phinp.domain;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
 
@@ -12,7 +11,7 @@ import java.time.ZonedDateTime;
  */
 @Entity
 @Table(name = "shop_sub")
-public class ShopSub implements Serializable {
+public class ShopSub extends domain.shopee.request.ShopSub implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -27,7 +26,6 @@ public class ShopSub implements Serializable {
     private String password;
 
     @Column(name = "token")
-    @Length(max = 21844)
     private String token;
 
     @Column(name = "name")

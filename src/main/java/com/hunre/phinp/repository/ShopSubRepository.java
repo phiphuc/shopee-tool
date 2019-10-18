@@ -13,5 +13,5 @@ import java.util.Optional;
 @SuppressWarnings("unused")
 @Repository
 public interface ShopSubRepository extends JpaRepository<ShopSub, Long> {
-    Optional<ShopSub> findByUsername(String username);
+    Optional<List<ShopSub>> findByUsernameAndStatus(String username, String status);
 }

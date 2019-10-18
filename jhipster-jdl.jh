@@ -12,8 +12,10 @@ entity ShopMain {
     version String,
     errorMsg String,
     error String,
+    status String,
     createDate ZonedDateTime,
-    updateDate ZonedDateTime
+    updateDate ZonedDateTime,
+    errorCode String
 }
 
 entity ShopSub {
@@ -21,8 +23,11 @@ entity ShopSub {
     password String,
     token String,
     name String,
+    message String,
+    status String,
     createDate ZonedDateTime,
-    updateDate ZonedDateTime
+    updateDate ZonedDateTime,
+    errorCode String
 }
 
 relationship ManyToOne {

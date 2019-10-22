@@ -137,7 +137,6 @@ public class ShopSubResource {
         if (shopSub.getShopId() == null) {
 
         }
-
        // Optional<List<ShopSub>> optionalShopSubs = shopSubRepository.findByUsernameAndStatus(shopSub.getUsername(),"ACTIVE");
 
         CompletableFuture<String> reply = shopSubService.getLogin(shopSub);

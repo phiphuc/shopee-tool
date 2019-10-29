@@ -7,10 +7,7 @@ import com.hunre.phinp.service.ShopSubService;
 import com.hunre.phinp.service.dto.ShopSubDTO;
 import com.hunre.phinp.web.rest.errors.BadRequestAlertException;
 
-import domain.shopee.response.GetIdByUsernameKafkaResponse;
-import domain.shopee.response.LoginResponse;
-import domain.shopee.response.OtpResponse;
-import domain.shopee.response.ShopSubResponse;
+import domain.shopee.response.*;
 import io.github.jhipster.web.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.apache.kafka.common.errors.ApiException;
@@ -146,13 +143,13 @@ public class ShopSubResource {
                 Gson requestGson = new Gson();
 
                 //error code = 0 thanh cong, 2 là sai otp
-                LoginResponse response = requestGson.fromJson(msgTemp, LoginResponse.class);
+            InformationKafkaResponse response = requestGson.fromJson(msgTemp, InformationKafkaResponse.class);
                 ShopSub shopResult = new ShopSub();
                 Optional<ShopSub> optionShop = shopSubRepository.findById(response.getId());
                 if (optionShop.isPresent()) {
                     optionShop.ifPresent(shop -> {
                         shopResult.setId(shop.getId());
-                        shopResult.setName(response.getUserid());
+                        shopResult.setName(response.getUsername());
                         shopResult.setCreateDate(shop.getCreateDate());
                         shopResult.setUpdateDate(ZonedDateTime.of(LocalDateTime.now(), ZoneId.of("Asia/Ho_Chi_Minh")));
                         shopResult.setPassword(shop.getPassword());

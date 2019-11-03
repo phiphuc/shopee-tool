@@ -72,8 +72,17 @@ public class ShopMainResource {
     @PostMapping("/shop-mains")
     public DeferredResult<ResponseEntity<ShopMainResponse>> createShopMain(@RequestBody ShopMain shopMain) throws URISyntaxException, ExecutionException, InterruptedException {
         log.debug("REST request to save ShopMain : {}", shopMain);
-
         DeferredResult<ResponseEntity<ShopMainResponse>> result = new DeferredResult<>();
+
+        Optional<List<ShopMain>> shopTemp = shopMainRepository.findByLinkShop(shopMain.getLinkShop());
+        if(shopTemp.isPresent()){
+            ShopMainResponse shopMainResponse = new ShopMainResponse();
+            shopMainResponse.setData(shopTemp.get().get(0));
+            shopMainResponse.setErrorCode(0);
+            result.setResult(new ResponseEntity<>(shopMainResponse, HttpStatus.OK));
+           return  result;
+        }
+
         ShopMainResponse res = new ShopMainResponse();
         CompletableFuture<String> reply = shopMainService.createShopAsyns(shopMain);
         reply.thenAccept(msg -> {
@@ -111,7 +120,6 @@ public class ShopMainResource {
             result.setErrorResult(new ApiException());
             return null;
         });
-
 
         return result;
     }

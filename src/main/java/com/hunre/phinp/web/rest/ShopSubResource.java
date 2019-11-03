@@ -25,6 +25,8 @@ import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -52,13 +54,7 @@ public class ShopSubResource {
         this.shopSubService = shopSubService;
     }
 
-    /**
-     * {@code POST  /shop-subs} : Create a new shopSub.
-     *
-     * @param shopSub the shopSub to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new shopSub, or with status {@code 400 (Bad Request)} if the shopSub has already an ID.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
-     */
+
     @PostMapping("/shop-subs")
     public ResponseEntity<ShopSub> createShopSub(@RequestBody ShopSub shopSub) throws URISyntaxException {
         log.debug("REST request to save ShopSub : {}", shopSub);
@@ -70,6 +66,34 @@ public class ShopSubResource {
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
             .body(result);
     }
+
+
+//    @GetMapping("/shop-subs/")
+//    public ResponseEntity<List<ShopSubResponse>> getShopSub(@RequestParam String shopId)  {
+//        log.debug("REST request to save ShopSub : {}", shopId);
+//        Optional<List<ShopSub>> optionalShopSubs = shopSubRepository.findByShopIdAndStatus(shopId, "ACTIVE");
+//        List<ShopSubResponse> subRes = new ArrayList<>();
+////        optionalShopSubs.(item ->{
+////            ShopSubResponse resSub = new ShopSubResponse();
+////            resSub.setErrorCode(0);
+////            resSub.setData((domain.shopee.request.ShopSub) item);
+////            subRes.add(resSub);
+////        }).;
+//        optionalShopSubs.get().stream().forEach(item -> {
+//            ShopSubResponse resSub = new ShopSubResponse();
+//            resSub.setErrorCode(0);
+//            resSub.setData(item);
+//            subRes.add(resSub);
+//        });
+//        return new ResponseEntity<>(subRes, HttpStatus.OK);
+//    }
+//    @GetMapping("/shop-subs/{id}")
+//    public ResponseEntity<ShopSub> getShopMain(@PathVariable Long id) {
+//        log.debug("REST request to get ShopMain : {}", id);
+//        Optional<ShopSub> ShopSub = shopSubRepository.findById(id);
+//        return ResponseUtil.wrapOrNotFound(ShopSub);
+//    }
+
 
     @PostMapping("/shop-subs/otp")
     public DeferredResult<ResponseEntity<ShopSubResponse>> getOtp(@RequestBody ShopSubDTO shopSub) {
@@ -199,11 +223,11 @@ public class ShopSubResource {
      *
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of shopSubs in body.
      */
-    @GetMapping("/shop-subs")
-    public List<ShopSub> getAllShopSubs() {
-        log.debug("REST request to get all ShopSubs");
-        return shopSubRepository.findAll();
-    }
+//    @GetMapping("/shop-subs")
+//    public List<ShopSub> getAllShopSubs() {
+//        log.debug("REST request to get all ShopSubs");
+//        return shopSubRepository.findAll();
+//    }
 
     /**
      * {@code GET  /shop-subs/:id} : get the "id" shopSub.
@@ -211,11 +235,18 @@ public class ShopSubResource {
      * @param id the id of the shopSub to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the shopSub, or with status {@code 404 (Not Found)}.
      */
-    @GetMapping("/shop-subs/{id}")
-    public ResponseEntity<ShopSub> getShopSub(@PathVariable Long id) {
-        log.debug("REST request to get ShopSub : {}", id);
-        Optional<ShopSub> shopSub = shopSubRepository.findById(id);
-        return ResponseUtil.wrapOrNotFound(shopSub);
+    @GetMapping("/shop-subs/{shopId}")
+    public ResponseEntity<List<ShopSubResponse>> getShopSub(@PathVariable Long shopId) {
+        log.debug("REST request to save ShopSub : {}", shopId);
+        List<ShopSub> optionalShopSubs = shopSubRepository.findByShopIdAndStatus(Long.toString(shopId), "ACTIVE");
+        List<ShopSubResponse> subRes = new ArrayList<>();
+        optionalShopSubs.stream().forEach(item -> {
+            ShopSubResponse resSub = new ShopSubResponse();
+            resSub.setErrorCode(0);
+            resSub.setData(item);
+            subRes.add(resSub);
+        });
+        return new ResponseEntity<>(subRes, HttpStatus.OK);
     }
 
     /**
